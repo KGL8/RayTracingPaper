@@ -1,4 +1,3 @@
-// src/window_init.rs
 use glfw::{Action, Context, Key};
 use gl::types::GLubyte;
 
@@ -34,14 +33,23 @@ impl WindowInit {
         while !self.window.should_close() {
             // Poll GLFW events
             self.glfw.poll_events();
-            // Flush the event queue and handle events
-            for (_, event) in glfw::flush_messages(&self.events) {
-                self.handle_event(event);
-            }
+            // Process and handle events
+            self.process_events();
 
             // Draw a frame and swap the buffers
             self.draw_frame();
             self.window.swap_buffers();
+        }
+    }
+
+    // Process and handle GLFW window events
+    fn process_events(&mut self) {
+        // Collect the events into a temporary Vec
+        let events: Vec<(f64, glfw::WindowEvent)> = glfw::flush_messages(&self.events).collect();
+
+        // Iterate through the temporary Vec and handle the events
+        for (_, event) in events {
+            self.handle_event(event);
         }
     }
 

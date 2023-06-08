@@ -1,4 +1,3 @@
-// src/main.rs
 mod window_init;
 use window_init::WindowInit;
 
