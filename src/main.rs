@@ -6,6 +6,7 @@ use winit::event::{Event, VirtualKeyCode};
 use winit::event_loop::{ControlFlow, EventLoop};
 use winit::window::WindowBuilder;
 use winit_input_helper::WinitInputHelper;
+use rand::{Rng, thread_rng};
 
 const WIDTH: u32 = 800;
 const HEIGHT: u32 = 600;
@@ -73,7 +74,8 @@ fn log_error<E: std::error::Error + 'static>(method_name: &str, err: E) {
 pub fn draw(frame: &mut [u8]) {
     for (_i, pixel) in frame.chunks_exact_mut(4).enumerate() {
 
-        let rgba = [255, 103, 177, 255];
+        let mut rng = thread_rng();
+        let rgba = [rng.gen_range(0..255), rng.gen_range(0..255), rng.gen_range(0..255), 255];
 
         pixel.copy_from_slice(&rgba);
     }
