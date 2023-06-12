@@ -1,5 +1,3 @@
-
-
 use cgmath::{Vector2, Vector3, InnerSpace, num_traits::pow};
 
 pub fn per_pixel (coord: Vector2<f32>) -> [u8;4] {
