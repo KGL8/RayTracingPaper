@@ -8,39 +8,9 @@ use winit_input_helper::WinitInputHelper;
 use crate::draw;
 use crate::utils::log_error;
 
-// the Number struct is arguably the worst decision of my life
-pub struct Number {
-    pub number: usize
-}
-
-impl Number {
-
-    pub fn usize(&self) -> usize {
-        self.number
-    }
-
-    pub fn u8(&self) -> u8 {
-        self.number as u8
-    }
-
-    pub fn u32(&self) -> u32 {
-        self.number as u32
-    }
-
-    pub fn f32(&self) -> f32 {
-        self.number as f32
-    }
-
-    pub fn f64(&self) -> f64 {
-        self.number as f64
-    }
-}
-
-const width: f32= 800.;
-const height: f32= 600.;
-pub const WIDTH: Number = Number{number: width as usize};
-pub const HEIGHT: Number = Number{number: height as usize};
-pub const ASP_RAT: f32 = width/height;
+pub const width: f32= 800.;
+pub const height: f32= 600.;
+pub const aspect_ratio: f32 = width/height;
 
 pub struct App {
     event_loop: EventLoop<()>,
@@ -56,7 +26,7 @@ impl App {
         let window = Self::create_window(&event_loop);
         let window_size = window.inner_size();
         let surface_texture = SurfaceTexture::new(window_size.width, window_size.height, &window);
-        let pixels = Pixels::new(WIDTH.u32(), HEIGHT.u32(), surface_texture)?;
+        let pixels = Pixels::new(width as u32, height as u32, surface_texture)?;
 
         Ok(Self {
             event_loop,
@@ -67,7 +37,7 @@ impl App {
     }
 
     pub fn create_window(event_loop: &EventLoop<()>) -> Window {
-        let size = LogicalSize::new(WIDTH.f64(), HEIGHT.f64());
+        let size = LogicalSize::new(width, height);
         WindowBuilder::new()
             .with_title("Hello Pixels")
             .with_inner_size(size)
@@ -103,7 +73,5 @@ impl App {
                 self.window.request_redraw();
             }
         });
-
-        Ok(())
     }
 }
