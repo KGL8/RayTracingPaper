@@ -1,6 +1,7 @@
 mod app;
-mod renderer;
+mod draw;
 mod utils;
+mod renderer;
 
 use pixels::Error;
 use app::App;

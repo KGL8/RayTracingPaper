@@ -5,14 +5,14 @@ use winit::event_loop::{ControlFlow, EventLoop};
 use winit::window::{Window, WindowBuilder};
 use winit_input_helper::WinitInputHelper;
 
-use crate::renderer;
+use crate::draw;
 use crate::utils::log_error;
 
-pub struct NUM {
+pub struct Number {
     pub number: usize
 }
 
-impl NUM {
+impl Number {
 
     pub fn usize(&self) -> usize {
         self.number
@@ -35,8 +35,8 @@ impl NUM {
     }
 }
 
-pub const WIDTH: NUM = NUM{number: 800};
-pub const HEIGHT: NUM = NUM{number: 600};
+pub const WIDTH: Number = Number{number: 800};
+pub const HEIGHT: Number = Number{number: 600};
 
 pub struct App {
     event_loop: EventLoop<()>,
@@ -75,7 +75,7 @@ impl App {
     pub fn run(mut self) -> Result<(), pixels::Error> {
         self.event_loop.run(move |event, _, control_flow| {
             if let Event::RedrawRequested(_) = event {
-                if let Err(err) = renderer::draw_frame(&mut self.pixels) {
+                if let Err(err) = draw::draw_frame(&mut self.pixels) {
                     log_error("renderer.draw_frame", err);
                     *control_flow = ControlFlow::Exit;
                     return;
