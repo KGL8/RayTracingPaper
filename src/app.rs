@@ -8,6 +8,7 @@ use winit_input_helper::WinitInputHelper;
 use crate::draw;
 use crate::utils::log_error;
 
+// the Number struct is arguably the worst decision of my life
 pub struct Number {
     pub number: usize
 }
@@ -35,8 +36,11 @@ impl Number {
     }
 }
 
-pub const WIDTH: Number = Number{number: 800};
-pub const HEIGHT: Number = Number{number: 600};
+const width: f32= 800.;
+const height: f32= 600.;
+pub const WIDTH: Number = Number{number: width as usize};
+pub const HEIGHT: Number = Number{number: height as usize};
+pub const ASP_RAT: f32 = width/height;
 
 pub struct App {
     event_loop: EventLoop<()>,
