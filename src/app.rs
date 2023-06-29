@@ -1,17 +1,16 @@
-use std::time::{Duration, Instant};
+use std::{time::{Instant}, cell::RefCell, rc::Rc};
 use pixels::{Pixels, SurfaceTexture};
 use winit::dpi::LogicalSize;
 use winit::event::{Event, VirtualKeyCode};
 use winit::event_loop::{ControlFlow, EventLoop};
 use winit::window::{Window, WindowBuilder};
 use winit_input_helper::WinitInputHelper;
-use crate::camera::Camera;
 use crate::renderer::Renderer;
 use crate::utils::log_error;
 
-pub const width: f32 = 800.;
-pub const height: f32 = 600.;
-pub const aspect_ratio: f32 = width/height;
+pub const WIDTH: f32 = 800.;
+pub const HEIGHT: f32 = 600.;
+pub const ASPECT_RATIO: f32 = WIDTH/HEIGHT;
 
 pub struct App {
     event_loop: EventLoop<()>,
@@ -27,7 +26,7 @@ impl App {
         let window = Self::create_window(&event_loop);
         let window_size = window.inner_size();
         let surface_texture = SurfaceTexture::new(window_size.width, window_size.height, &window);
-        let pixels = Pixels::new(width as u32, height as u32, surface_texture)?;
+        let pixels = Pixels::new(WIDTH as u32, HEIGHT as u32, surface_texture)?;
 
         Ok(Self {
             event_loop,
@@ -38,7 +37,7 @@ impl App {
     }
 
     pub fn create_window(event_loop: &EventLoop<()>) -> Window {
-        let size = LogicalSize::new(width, height);
+        let size = LogicalSize::new(WIDTH, HEIGHT);
         WindowBuilder::new()
             .with_title("Ray Tracer")
             .with_inner_size(size)
@@ -47,18 +46,27 @@ impl App {
             .unwrap()
     }
 
-    pub fn run(mut self, renderer: Renderer) -> Result<(), pixels::Error> {
+    pub fn run(mut self, renderer: Rc<RefCell<Renderer>>) -> Result<(), pixels::Error> {
 
-        let previous_frame_time = Instant::now();
+        let mut previous_frame_time = Instant::now();
 
         self.event_loop.run(move |event, _, control_flow| {
             if let Event::RedrawRequested(_) = event {
 
-                let timestep = previous_frame_time.elapsed();
-                renderer.on_update(timestep.as_secs_f32(), &self.input);
+                let current_frame_time = Instant::now();
+                let timestep = current_frame_time.duration_since(previous_frame_time).as_secs_f32();
+                previous_frame_time = current_frame_time;
+                
+                // Use borrow_mut() to get a mutable reference
+                if let Ok(mut borrowed_renderer) = renderer.try_borrow_mut() { 
+                    borrowed_renderer.on_update(timestep, &self.input);
 
-                if let Err(err) = renderer.render(&mut self.pixels) {
-                    log_error("renderer.draw_frame", err);
+                    if let Err(err) = borrowed_renderer.render(&mut self.pixels) {
+                        log_error("renderer.draw_frame", err);
+                        *control_flow = ControlFlow::Exit;
+                        return;
+                    }
+                } else {
                     *control_flow = ControlFlow::Exit;
                     return;
                 }
